@@ -1,7 +1,10 @@
 # LOW CARB — CUSTOMER APP PLAN (`lowcarb-app`)
 
-The customer-facing PWA. Ships AFTER the order system (S1–S2), because it
-reads the same subscriptions/deliveries the team manages there.
+The customer-facing PWA. **Ships BEFORE the order system** (app-first
+sequencing, decided 2026-07-07): customers self-register and place
+`pending` subscriptions; the team activates them manually in Supabase
+Studio until the order system (SYSTEM-PLAN) exists. Screens that depend
+on staff-managed data (delivery status) are deferred until then.
 
 ## Stack
 - React + Vite **PWA** + Tailwind, RTL Arabic only, brand tokens identical
@@ -11,25 +14,29 @@ reads the same subscriptions/deliveries the team manages there.
   except `pause_requests` (Phase A2).
 - Hosting: Cloudflare Pages, project `lowcarb-app`.
 
-## Auth decision (make once, in A1)
-SMS OTP in Iraq is costly/unreliable, so default to **staff-provisioned
-accounts**: when the team activates a subscription in the order system,
-it creates the Supabase auth user (phone-as-email alias
-`9647...@lowcarb.app` + generated password) and sends the customer their
-login over WhatsApp. `customers.auth_uid` links the account. Revisit real
-phone OTP only if a provider (e.g. Twilio Verify/WhatsApp OTP) is approved
-later — the schema already supports it.
+## Auth decision (locked for A0)
+SMS OTP in Iraq is costly/unreliable, so **self-registration** with
+phone + password: the app normalizes the Iraqi phone (07XX… → 9647…)
+into the alias email `{phone}@lowcarb.app` and signs up through Supabase
+email/password auth with **email confirmation disabled** in the Supabase
+dashboard. Signup inserts the `customers` row itself
+(`auth_uid = auth.uid()` enforced by RLS). Subscriptions created from
+the app start `status='pending'`, `source='app'` and are activated
+manually in Supabase Studio until the order system exists. Revisit real
+phone OTP only if a provider (e.g. Twilio Verify/WhatsApp OTP) is
+approved later — the schema already supports it.
 
 ## Screens
 
-### A1 — Read-only "my subscription" (first release)
-- Login (phone + password from WhatsApp).
+### A1 — "my subscription" (first release)
+- Login + signup (phone + password, self-registration — see above).
 - **Home**: plan name, meals/day, start → end, days remaining ring,
   Friday included or not, status badge.
 - **This week**: today's dishes highlighted, rest of the current
   `week_no` from `menu_days`.
-- **Deliveries**: today's status (pending/prepared/out/delivered) — the
-  "وين وجبتي؟" answer that kills half the WhatsApp messages.
+- **Deliveries**: DEFERRED until the order system exists — today's status
+  (pending/prepared/out/delivered), the "وين وجبتي؟" answer that kills
+  half the WhatsApp messages, needs staff actually updating statuses.
 - RLS: customer reads ONLY own rows —
   `customer_id = (select id from customers where auth_uid = auth.uid())`
   wrapped in a SECURITY DEFINER helper `my_customer_id()` (the exact
