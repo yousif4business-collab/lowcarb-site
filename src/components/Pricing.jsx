@@ -1,6 +1,7 @@
 import { Arc, Reveal } from './ui.jsx'
 import { PLANS, FRIDAY_NOTE } from '../data/plans.js'
 import { wa } from '../data/config.js'
+import Calculator from './Calculator.jsx'
 
 export default function Pricing() {
   return (
@@ -62,6 +63,8 @@ export default function Pricing() {
               <span className="text-lemon">{FRIDAY_NOTE.add}</span>
             </p>
           </Reveal>
+
+          <Calculator />
         </div>
       </div>
       <Arc fill="#482465" flip className="bg-paper -mt-px" />
