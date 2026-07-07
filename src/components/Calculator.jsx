@@ -11,12 +11,16 @@ const GOALS = [
   { v: 'muscle', label: 'بناء عضل', meals: 3 }
 ]
 
+const TIMES = ['صباحاً', 'ظهراً', 'مساءً', 'أي وقت']
+
 /* ركّب اشتراكك — segmented pills feeding one live total */
 export default function Calculator() {
   const [goal, setGoal] = useState('loss')
   const [duration, setDuration] = useState('monthly')
   const [meals, setMeals] = useState(2)
   const [friday, setFriday] = useState(false)
+  const [zone, setZone] = useState('')
+  const [time, setTime] = useState('أي وقت')
 
   const isWeekly = duration === 'weekly'
   const effMeals = isWeekly ? 2 : meals
@@ -24,9 +28,12 @@ export default function Calculator() {
   const unit = isWeekly ? 'ألف / أسبوع' : 'ألف / شهر'
 
   const goalLabel = GOALS.find((g) => g.v === goal).label
-  const waMsg = `مرحبا، اريد اشتراك ${isWeekly ? 'أسبوعي' : 'شهري'} — ${
-    MEAL_LABELS[effMeals]
-  } يومياً، ${friday ? 'مع يوم الجمعة' : 'بدون الجمعة'} — المجموع ${total} ألف دينار، هدفي: ${goalLabel}`
+  const waMsg =
+    `مرحبا، اريد اشتراك ${isWeekly ? 'أسبوعي' : 'شهري'} — ${
+      MEAL_LABELS[effMeals]
+    } يومياً، ${friday ? 'مع يوم الجمعة' : 'بدون الجمعة'} — المجموع ${total} ألف دينار، هدفي: ${goalLabel}` +
+    (zone.trim() ? `، منطقتي: ${zone.trim()}` : '') +
+    (time !== 'أي وقت' ? `، وقت التوصيل: ${time}` : '')
 
   return (
     <Reveal className="mx-auto mt-12 max-w-2xl rounded-[32px] bg-white p-8 text-start shadow-pop md:p-10">
@@ -83,6 +90,24 @@ export default function Calculator() {
             ]}
             value={friday}
             onChange={setFriday}
+          />
+        </Row>
+
+        <Row label="منطقتك بالبغداد (اختياري)">
+          <input
+            type="text"
+            value={zone}
+            onChange={(e) => setZone(e.target.value)}
+            placeholder="مثلاً: المنصور، زيونة…"
+            className="w-full max-w-sm rounded-full border-2 border-grape/10 bg-paper px-5 py-2.5 text-[15px] font-medium text-ink placeholder:text-muted/60 focus:border-grape focus:outline-none"
+          />
+        </Row>
+
+        <Row label="وقت التوصيل المفضل">
+          <Seg
+            options={TIMES.map((t) => ({ v: t, label: t }))}
+            value={time}
+            onChange={setTime}
           />
         </Row>
       </div>
