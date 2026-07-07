@@ -32,6 +32,48 @@ export function Reveal({ children, className = '', as: Tag = 'div', delay = 0 })
   )
 }
 
+/* ── magnetic hover wrapper (pointer:fine + motion-safe only) ──────── */
+export function Magnetic({ children, className = '' }) {
+  const ref = useRef(null)
+  const onMove = (e) => {
+    const el = ref.current
+    if (
+      !el ||
+      !window.matchMedia('(pointer: fine)').matches ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    )
+      return
+    const r = el.getBoundingClientRect()
+    const x = (e.clientX - r.left - r.width / 2) * 0.22
+    const y = (e.clientY - r.top - r.height / 2) * 0.22
+    el.style.transform = `translate(${x}px, ${y}px)`
+  }
+  const onLeave = () => {
+    if (ref.current) ref.current.style.transform = ''
+  }
+  return (
+    <span
+      ref={ref}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      className={`inline-block transition-transform duration-150 ease-out ${className}`}
+    >
+      {children}
+    </span>
+  )
+}
+
+/* ── word-by-word cascade (pairs with .word in index.css) ──────────── */
+export function Words({ text, base = 0 }) {
+  return text.split(' ').map((w, i) => (
+    <span key={`${w}-${i}`}>
+      <span className="word" style={{ '--i': base + i }}>
+        {w}
+      </span>{' '}
+    </span>
+  ))
+}
+
 /* ── curved section divider (the printed-menu arc) ─────────────────── */
 export function Arc({ fill = '#F2EA4F', flip = false, className = '' }) {
   return (

@@ -38,6 +38,14 @@ export const PLANS = [
   }
 ]
 
+// أسعار الحاسبة — بالألف دينار: PRICING[المدة][عدد الوجبات يومياً]
+export const PRICING = {
+  weekly: { 2: 100 },
+  monthly: { 1: 175, 2: 325, 3: 425 }
+}
+
+export const FRIDAY_ADD = 15
+
 export const FRIDAY_NOTE = {
   base: 'الاشتراكات بدون يوم الجمعة',
   add: 'إضافة الجمعة: 15 ألف على الاشتراك'
