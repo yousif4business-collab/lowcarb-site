@@ -1,4 +1,4 @@
-import { Reveal, WaButton } from './ui.jsx'
+import { Reveal, ShareIcon, shareWeek, WaButton } from './ui.jsx'
 import { WEEKS } from '../data/menu.js'
 import { todayRotation } from '../data/rotation.js'
 import { NUTRITION_CONFIRMED, dishInfo, dayTotals } from '../data/nutrition.js'
@@ -8,11 +8,13 @@ import bowlRiceMeat from '../assets/food/bowl-rice-meat.webp'
 export default function TodayMeals() {
   const rot = todayRotation()
 
+  const week = WEEKS[rot.weekNo - 1]
+
   if (rot.isFriday) {
     const next = todayRotation(new Date(Date.now() + 86400000))
     const nextWeek = WEEKS[next.weekNo - 1]
     return (
-      <Shell chip="اليوم الجمعة" title="عطلتنا الأسبوعية — نرجع باچر">
+      <Shell chip="اليوم الجمعة" title="عطلتنا الأسبوعية — نرجع باچر" week={nextWeek}>
         <p className="mt-3 text-lg font-medium text-ink/70">
           السبت نبدي {nextWeek.title} — ثبت اشتراكك من الآن.
         </p>
@@ -23,12 +25,11 @@ export default function TodayMeals() {
     )
   }
 
-  const week = WEEKS[rot.weekNo - 1]
   const day = week.days[rot.dayIndex]
   const totals = dayTotals(day.dishes)
 
   return (
-    <Shell chip="أكلات اليوم" title={`${rot.dayName} · ${week.title}`}>
+    <Shell chip="أكلات اليوم" title={`${rot.dayName} · ${week.title}`} week={week}>
       <p className="mt-3 text-xl font-bold leading-relaxed text-ink/80">
         {day.dishes.join(' · ')}
       </p>
@@ -66,11 +67,21 @@ export default function TodayMeals() {
   )
 }
 
-function Shell({ chip, title, children }) {
+function Shell({ chip, title, week, children }) {
   return (
     <section className="bg-paper pb-4 pt-16 md:pt-20">
       <div className="mx-auto max-w-3xl px-6">
         <Reveal className="relative overflow-hidden rounded-[32px] bg-white p-8 shadow-pop md:p-10">
+          {week && (
+            <button
+              type="button"
+              onClick={() => shareWeek(week)}
+              aria-label="شارك منيو الأسبوع"
+              className="absolute end-6 top-6 grid h-10 w-10 place-items-center rounded-full bg-paper text-grape ring-1 ring-grape/15 transition hover:bg-lemon"
+            >
+              <ShareIcon />
+            </button>
+          )}
           <img
             src={bowlRiceMeat}
             alt=""

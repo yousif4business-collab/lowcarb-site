@@ -34,8 +34,12 @@ npx wrangler pages deploy dist --project-name lowcarb-site
 
 1. **WhatsApp number** — `src/data/config.js` → `WHATSAPP` (currently
    `9647XXXXXXXXX`). Every CTA on the site builds from this one constant.
-2. Confirm delivery zones wording in `src/components/Chrome.jsx` (Rules)
-   once the client confirms coverage.
+2. Confirm delivery zones wording once the client confirms coverage.
+3. **Cloudflare Web Analytics** — `index.html` has a beacon with the literal
+   placeholder `CF_ANALYTICS_TOKEN`. Create the token at dash.cloudflare.com
+   → Web Analytics → Add site → `lowcarb-site.pages.dev` and swap it in.
+4. **Rotation anchor** — `src/data/config.js` → `ROTATION_ANCHOR`: confirm
+   with the kitchen which Saturday starts "الأسبوع الأول".
 
 ## Brand tokens
 

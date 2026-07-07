@@ -115,6 +115,73 @@ export function WaIcon({ size = 22 }) {
   )
 }
 
+/* ── Qi Card badge — official logo if present, text fallback ───────── */
+// optional asset: drop the official logo at src/assets/brand/qi.png
+const qiLogo = import.meta.glob('../assets/brand/qi.png', {
+  eager: true,
+  import: 'default'
+})['../assets/brand/qi.png']
+
+export function QiBadge({ sm = false, className = '' }) {
+  if (qiLogo) {
+    return (
+      <span
+        className={`inline-flex items-center rounded-xl bg-white px-3 ring-1 ring-grape/15 ${
+          sm ? 'py-1' : 'py-1.5'
+        } ${className}`}
+      >
+        <img src={qiLogo} alt="Qi Card" className={`w-auto ${sm ? 'h-6' : 'h-8'}`} />
+      </span>
+    )
+  }
+  return (
+    <span
+      className={`inline-flex items-center rounded-full bg-white font-display font-bold text-grape ring-1 ring-grape/15 ${
+        sm ? 'px-3 py-1 text-[13px]' : 'px-4 py-1.5 text-[15px]'
+      } ${className}`}
+    >
+      كي كارد
+    </span>
+  )
+}
+
+/* ── share a week's menu (native share, wa.me fallback) ────────────── */
+export function shareWeek(week) {
+  const text =
+    `منيو ${week.title} — Low Carb\n` +
+    week.days.map((d) => `${d.day}: ${d.dishes.join('، ')}`).join('\n')
+  if (navigator.share) {
+    navigator.share({ title: 'Low Carb', text, url: location.href }).catch(() => {})
+  } else {
+    window.open(
+      `https://wa.me/?text=${encodeURIComponent(`${text}\n${location.href}`)}`,
+      '_blank',
+      'noopener'
+    )
+  }
+}
+
+export function ShareIcon({ size = 18 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="6" cy="12" r="2.6" />
+      <circle cx="17.5" cy="5.5" r="2.6" />
+      <circle cx="17.5" cy="18.5" r="2.6" />
+      <path d="m8.4 10.8 6.8-4M8.4 13.2l6.8 4" />
+    </svg>
+  )
+}
+
 /* ── leaf accent (from the logo) ───────────────────────────────────── */
 export function Leaf({ className = '' }) {
   return (

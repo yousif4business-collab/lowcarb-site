@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Reveal, WaButton } from './ui.jsx'
+import { QiBadge, Reveal, WaButton } from './ui.jsx'
 import { PRICING, FRIDAY_ADD } from '../data/plans.js'
 
 const MEAL_LABELS = { 1: 'وجبة واحدة', 2: 'وجبتين', 3: '٣ وجبات' }
@@ -96,8 +96,11 @@ export default function Calculator() {
           <WaButton msg={waMsg}>ثبّت هذا الاشتراك</WaButton>
         </div>
         <p className="mt-4 text-sm font-medium text-muted">
-          تنرسل تفاصيل اختيارك جاهزة على واتساب
+          تنرسل تفاصيل اختيارك جاهزة على واتساب — والدفع عبر كي كارد
         </p>
+        <div className="mt-2.5 flex justify-center">
+          <QiBadge sm />
+        </div>
       </div>
     </Reveal>
   )

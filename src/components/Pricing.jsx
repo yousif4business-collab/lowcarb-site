@@ -1,4 +1,4 @@
-import { Arc, Reveal } from './ui.jsx'
+import { Arc, QiBadge, Reveal } from './ui.jsx'
 import { PLANS, FRIDAY_NOTE } from '../data/plans.js'
 import { wa } from '../data/config.js'
 import Calculator from './Calculator.jsx'
@@ -62,6 +62,15 @@ export default function Pricing() {
               <span className="text-lemon">·</span>
               <span className="text-lemon">{FRIDAY_NOTE.add}</span>
             </p>
+          </Reveal>
+
+          <Reveal delay={260}>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <QiBadge />
+              <span className="text-[15px] font-bold text-white/85">
+                الدفع عبر تحويل كي كارد — نأكد التفاصيل على واتساب
+              </span>
+            </div>
           </Reveal>
 
           <Calculator />

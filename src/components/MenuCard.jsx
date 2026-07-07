@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Reveal } from './ui.jsx'
+import { Reveal, ShareIcon, shareWeek } from './ui.jsx'
 import { WEEKS } from '../data/menu.js'
 import { todayRotation } from '../data/rotation.js'
 import { NUTRITION_CONFIRMED, dishInfo, dayTotals } from '../data/nutrition.js'
@@ -9,9 +9,18 @@ import bowlWhiteRice from '../assets/food/bowl-white-rice.webp'
 import bowlAvocado from '../assets/food/bowl-avocado.webp'
 import bowlRiceMeat from '../assets/food/bowl-rice-meat.webp'
 
+const FILTERS = [
+  { v: 'all', label: 'الكل' },
+  { v: 'دجاج', label: 'دجاج' },
+  { v: 'لحم', label: 'لحم' },
+  { v: 'معكرونة', label: 'معكرونة' },
+  { v: 'low', label: 'الأقل كارب' }
+]
+
 export default function MenuCard() {
   const currentWeek = todayRotation().weekNo
   const [week, setWeek] = useState(currentWeek)
+  const [filter, setFilter] = useState('all')
   const active = WEEKS.find((w) => w.id === week)
 
   return (
@@ -27,6 +36,16 @@ export default function MenuCard() {
             <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
               نفس المنيو المطبوع مالتنا — بس تفاعلي. كل أسبوع أكلات مختلفة، بدون تكرار.
             </p>
+          </Reveal>
+          <Reveal delay={140}>
+            <button
+              type="button"
+              onClick={() => shareWeek(active)}
+              className="mt-5 inline-flex items-center gap-2 rounded-full border-2 border-grape/20 px-5 py-2.5 font-display text-[15px] font-bold text-grape transition hover:border-grape hover:bg-grape hover:text-lemon"
+            >
+              <ShareIcon />
+              شارك منيو الأسبوع
+            </button>
           </Reveal>
         </div>
 
@@ -89,6 +108,25 @@ export default function MenuCard() {
               className="pointer-events-none absolute -left-8 bottom-2 w-64 -rotate-12 opacity-[0.05]"
             />
 
+            {/* nutrition filters */}
+            <div className="flex flex-wrap justify-center gap-2 px-6 pt-3">
+              {FILTERS.map((f) => (
+                <button
+                  key={f.v}
+                  type="button"
+                  onClick={() => setFilter(f.v)}
+                  aria-pressed={filter === f.v}
+                  className={`rounded-full px-4 py-1.5 font-display text-[13px] font-bold transition motion-reduce:transition-none ${
+                    filter === f.v
+                      ? 'bg-grapedeep text-lemon'
+                      : 'bg-white/50 text-grape/80 hover:bg-white/80'
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+
             {/* week tabs */}
             <div
               role="tablist"
@@ -138,7 +176,7 @@ export default function MenuCard() {
               className="week-anim grid gap-5 px-6 pb-16 pt-6 md:grid-cols-2 md:px-12 lg:grid-cols-3"
             >
               {active.days.map((d) => (
-                <DayCard key={d.day} d={d} />
+                <DayCard key={d.day} d={d} filter={filter} />
               ))}
             </div>
           </div>
@@ -149,9 +187,24 @@ export default function MenuCard() {
 }
 
 /* one day: dish rows expand to a macro panel — single-open per card */
-function DayCard({ d }) {
+function DayCard({ d, filter = 'all' }) {
   const [open, setOpen] = useState(-1)
   const totals = dayTotals(d.dishes)
+
+  // 'الأقل كارب' badges the day's lowest-carb dish instead of dimming
+  const lowestCarb =
+    filter === 'low'
+      ? d.dishes.reduce((min, dish) => {
+          const c = dishInfo(dish)?.carbs
+          if (c === undefined) return min
+          return min === null || c < dishInfo(min).carbs ? dish : min
+        }, null)
+      : null
+
+  const dimmed = (dish) => {
+    if (filter === 'all' || filter === 'low') return false
+    return !(dishInfo(dish)?.tags ?? []).includes(filter)
+  }
 
   return (
     <div className="rounded-2xl bg-white/60 p-5">
@@ -172,14 +225,26 @@ function DayCard({ d }) {
             )
           }
           return (
-            <div key={dish}>
+            <div
+              key={dish}
+              className={`transition-opacity duration-300 motion-reduce:transition-none ${
+                dimmed(dish) ? 'opacity-30' : ''
+              }`}
+            >
               <button
                 type="button"
                 onClick={() => setOpen(isOpen ? -1 : i)}
                 aria-expanded={isOpen}
                 className="flex w-full items-center justify-between gap-3 rounded-xl px-1 py-1.5 text-start transition hover:bg-white/70"
               >
-                <span className="font-medium text-lg leading-snug text-ink/80">{dish}</span>
+                <span className="font-medium text-lg leading-snug text-ink/80">
+                  {dish}
+                  {dish === lowestCarb && (
+                    <span className="ms-2 inline-block rounded-full bg-lemon px-2 py-0.5 align-middle text-[11px] font-extrabold text-grape">
+                      الأقل كارب
+                    </span>
+                  )}
+                </span>
                 <svg
                   viewBox="0 0 24 24"
                   aria-hidden="true"

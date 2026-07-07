@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Reveal, WaButton, WaIcon } from './ui.jsx'
+import { QiBadge, Reveal, WaButton, WaIcon } from './ui.jsx'
 import { wa, CITY, INSTAGRAM } from '../data/config.js'
 import lockupYellow from '../assets/brand/lc-lockup-yellow.png'
 
@@ -265,9 +265,13 @@ export function Footer() {
             </a>
           )}
         </div>
-        <p className="mt-6 text-sm font-bold text-white/60">
-          توصيل يومي داخل بغداد — السبت إلى الخميس
-        </p>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm font-bold text-white/60">
+          <span>توصيل يومي داخل بغداد — السبت إلى الخميس</span>
+          <span className="flex items-center gap-2">
+            الدفع عبر كي كارد
+            <QiBadge sm />
+          </span>
+        </div>
         <p className="mt-3 text-sm text-white/40">© Low Carb · {CITY} — جميع الحقوق محفوظة</p>
       </div>
     </footer>
