@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import markWhite from '../assets/brand/lc-mark-white.png'
+
+const markWhite = '/brand/lc-mark-white.png'
 
 /* splash mark — once per session, skippable, skipped under reduced motion */
 export default function Intro() {

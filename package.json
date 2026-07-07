@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "build:onefile": "SINGLE=1 vite build",
+    "qa": "node scripts/qa.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

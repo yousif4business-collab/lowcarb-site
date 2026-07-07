@@ -3,8 +3,9 @@ import { Reveal, ShareIcon, shareWeek } from './ui.jsx'
 import { WEEKS } from '../data/menu.js'
 import { todayRotation } from '../data/rotation.js'
 import { NUTRITION_CONFIRMED, dishInfo, dayTotals } from '../data/nutrition.js'
-import markWhite from '../assets/brand/lc-mark-white.png'
 import markPurple from '../assets/brand/lc-mark-purple.png'
+
+const markWhite = '/brand/lc-mark-white.png'
 import bowlWhiteRice from '../assets/food/bowl-white-rice.webp'
 import bowlAvocado from '../assets/food/bowl-avocado.webp'
 import bowlRiceMeat from '../assets/food/bowl-rice-meat.webp'
@@ -162,7 +163,7 @@ export default function MenuCard() {
             </div>
 
             {!NUTRITION_CONFIRMED && (
-              <p className="px-6 pt-4 text-center text-[13px] font-bold text-grape/60">
+              <p className="px-6 pt-4 text-center text-[13px] font-bold text-grape/80">
                 * القيم الغذائية تقريبية وقد تختلف حسب التحضير
               </p>
             )}

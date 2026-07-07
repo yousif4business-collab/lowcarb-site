@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { QiBadge, Reveal, WaButton, WaIcon } from './ui.jsx'
 import { wa, CITY, INSTAGRAM } from '../data/config.js'
 import lockupYellow from '../assets/brand/lc-lockup-yellow.png'
@@ -16,6 +16,20 @@ export function Nav() {
   const [scrolled, setScrolled] = useState(false)
   const [active, setActive] = useState('')
   const [open, setOpen] = useState(false)
+  const burgerRef = useRef(null)
+
+  // Escape closes the mobile panel and hands focus back to the burger
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        setOpen(false)
+        burgerRef.current?.focus()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open])
 
   useEffect(() => {
     const onScroll = () => {
@@ -71,6 +85,7 @@ export function Nav() {
             اشترك الآن
           </a>
           <button
+            ref={burgerRef}
             type="button"
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
@@ -272,7 +287,7 @@ export function Footer() {
             <QiBadge sm />
           </span>
         </div>
-        <p className="mt-3 text-sm text-white/40">© Low Carb · {CITY} — جميع الحقوق محفوظة</p>
+        <p className="mt-3 text-sm text-white/60">© Low Carb · {CITY} — جميع الحقوق محفوظة</p>
       </div>
     </footer>
   )

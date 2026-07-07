@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { Arc, Magnetic, Reveal, WaButton, Words } from './ui.jsx'
-import markWhite from '../assets/brand/lc-mark-white.png'
 import markPurple from '../assets/brand/lc-mark-purple.png'
+
+// LCP element — served from /public so index.html can preload it
+const markWhite = '/brand/lc-mark-white.png'
 import bowlChicken from '../assets/food/bowl-grilled-chicken.webp'
 import bowlOrange from '../assets/food/bowl-orange-rice.webp'
 import bowlVeggie from '../assets/food/bowl-veggie.webp'
@@ -41,7 +43,10 @@ export default function Hero() {
         <img
           src={markWhite}
           alt="Low Carb"
-          className="mx-auto h-24 md:h-28 drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)]"
+          width="1177"
+          height="575"
+          fetchpriority="high"
+          className="mx-auto h-24 w-auto md:h-28 drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)]"
         />
       </div>
       <Arc fill="#F2EA4F" className="bg-grape -mb-px" />
@@ -121,7 +126,7 @@ export default function Hero() {
             </Magnetic>
           </Reveal>
           <Reveal delay={320}>
-            <p className="mt-6 text-sm font-bold text-grape/60">
+            <p className="mt-6 text-sm font-bold text-grape/80">
               بدون يوم الجمعة · تكدر تضيف الجمعة بـ 15 ألف
             </p>
           </Reveal>
