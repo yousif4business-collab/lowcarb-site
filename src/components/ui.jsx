@@ -32,6 +32,62 @@ export function Reveal({ children, className = '', as: Tag = 'div', delay = 0 })
   )
 }
 
+/* ── 3D-interactive mark: pointer tilt on fine pointers, gyro tilt where
+      permission-free (Android); static everywhere else ───────────────── */
+export function TiltMark({ children, className = '', max = 10 }) {
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const set = (rx, ry) => {
+      el.style.transform = `perspective(600px) rotateX(${rx}deg) rotateY(${ry}deg)`
+    }
+    const clamp = (v) => Math.max(-max, Math.min(max, v))
+
+    if (window.matchMedia('(pointer: fine)').matches) {
+      const onMove = (e) => {
+        const r = el.getBoundingClientRect()
+        set(
+          clamp(-((e.clientY - r.top) / r.height - 0.5) * 2 * max),
+          clamp(((e.clientX - r.left) / r.width - 0.5) * 2 * max)
+        )
+      }
+      const onLeave = () => {
+        el.style.transform = ''
+      }
+      el.addEventListener('mousemove', onMove)
+      el.addEventListener('mouseleave', onLeave)
+      return () => {
+        el.removeEventListener('mousemove', onMove)
+        el.removeEventListener('mouseleave', onLeave)
+      }
+    }
+
+    // iOS requires a permission gesture for gyro — static fallback there
+    if (
+      typeof window.DeviceOrientationEvent !== 'undefined' &&
+      typeof window.DeviceOrientationEvent.requestPermission !== 'function'
+    ) {
+      const onOrient = (e) => {
+        if (e.beta == null || e.gamma == null) return
+        // beta rests ~45° in-hand; recentre so the mark sits flat there
+        set(clamp((e.beta - 45) / 4), clamp(e.gamma / 4))
+      }
+      window.addEventListener('deviceorientation', onOrient)
+      return () => window.removeEventListener('deviceorientation', onOrient)
+    }
+  }, [max])
+
+  return (
+    <span ref={ref} className={`tilt-mark ${className}`}>
+      {children}
+    </span>
+  )
+}
+
 /* ── magnetic hover wrapper (pointer:fine + motion-safe only) ──────── */
 export function Magnetic({ children, className = '' }) {
   const ref = useRef(null)

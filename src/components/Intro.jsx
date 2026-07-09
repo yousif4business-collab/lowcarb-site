@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 
 const markWhite = '/brand/lc-mark-white.png'
 
-/* splash mark — once per session, skippable, skipped under reduced motion */
+/* welcome intro v2 — 3D mark pop, two lines, lemon arc wipe.
+   ≤2.5s total, click-skip, once per session, skipped under reduced motion */
 export default function Intro() {
   const [phase, setPhase] = useState(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 'off'
@@ -13,10 +14,10 @@ export default function Intro() {
   useEffect(() => {
     if (phase === 'off') return
     sessionStorage.setItem('lc-intro', '1')
-    const toFade = setTimeout(() => setPhase('fade'), 1400)
-    const toOff = setTimeout(() => setPhase('off'), 1900)
+    const toWipe = setTimeout(() => setPhase('wipe'), 1850)
+    const toOff = setTimeout(() => setPhase('off'), 2450)
     return () => {
-      clearTimeout(toFade)
+      clearTimeout(toWipe)
       clearTimeout(toOff)
     }
   }, [])
@@ -27,11 +28,44 @@ export default function Intro() {
     <div
       onClick={() => setPhase('off')}
       aria-hidden="true"
-      className={`fixed inset-0 z-[100] grid place-items-center bg-grape transition-opacity duration-500 ${
-        phase === 'fade' ? 'opacity-0' : 'opacity-100'
-      }`}
+      className="fixed inset-0 z-[100] overflow-hidden bg-grape"
+      style={{ perspective: '900px' }}
     >
-      <img src={markWhite} alt="" className="intro-mark h-32 w-auto md:h-40" />
+      <div className="grid h-full place-items-center">
+        <div className="text-center">
+          {/* layered copies fan back in Z for a solid 3D extrusion */}
+          <div className="intro3d relative mx-auto h-32 w-64 md:h-40 md:w-80">
+            {[4, 3, 2, 1].map((z) => (
+              <img
+                key={z}
+                src={markWhite}
+                alt=""
+                className="absolute inset-0 h-full w-full object-contain"
+                style={{
+                  transform: `translateZ(${-z * 5}px)`,
+                  filter: `brightness(${1 - z * 0.18})`,
+                  opacity: 0.9
+                }}
+              />
+            ))}
+            <img
+              src={markWhite}
+              alt=""
+              className="absolute inset-0 h-full w-full object-contain drop-shadow-[0_18px_36px_rgba(0,0,0,0.45)]"
+            />
+          </div>
+
+          <p className="intro-line font-display text-lg font-bold text-white/90 md:text-2xl" style={{ '--d': '0.7s' }}>
+            مطبخ سحابي · وجبات لو كارب
+          </p>
+          <p className="intro-line mt-2 font-display text-base font-bold text-lemon md:text-xl" style={{ '--d': '1.15s' }}>
+            طازة يومياً بإشراف شيف تغذية
+          </p>
+        </div>
+      </div>
+
+      {/* lemon arc rises to wipe the screen before unmount */}
+      <div className={`intro-wipe ${phase === 'wipe' ? 'go' : ''}`} />
     </div>
   )
 }

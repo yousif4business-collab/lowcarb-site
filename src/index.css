@@ -87,23 +87,63 @@ section[id] {
   overflow: hidden;
 }
 
-/* intro splash */
-.intro-mark {
-  animation: introMark 0.9s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+/* welcome intro v2 — 3D mark pop + lines + lemon arc wipe */
+.intro3d {
+  transform-style: preserve-3d;
+  animation: intro3d 1.1s cubic-bezier(0.2, 0.7, 0.3, 1) both;
 }
-@keyframes introMark {
+@keyframes intro3d {
   0% {
-    transform: scale(0.5);
+    transform: scale(0.4) rotateX(38deg) rotateY(-18deg);
     opacity: 0;
   }
-  60% {
-    transform: scale(1.07);
+  55% {
+    transform: scale(1.06) rotateX(-7deg) rotateY(7deg);
     opacity: 1;
   }
   100% {
-    transform: scale(1);
+    transform: scale(1) rotateX(6deg) rotateY(-6deg);
     opacity: 1;
   }
+}
+.intro-line {
+  animation: introLine 0.5s ease-out both;
+  animation-delay: var(--d, 0s);
+}
+@keyframes introLine {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.intro-wipe {
+  position: absolute;
+  inset-inline: -20%;
+  bottom: -25%;
+  height: 0;
+  background: #f2ea4f;
+  border-radius: 50% 50% 0 0 / 30% 30% 0 0;
+  pointer-events: none;
+}
+.intro-wipe.go {
+  animation: introWipe 0.55s cubic-bezier(0.6, 0, 0.3, 1) both;
+}
+@keyframes introWipe {
+  to {
+    height: 175%;
+  }
+}
+
+/* 3D-interactive brand mark (nav + hero) */
+.tilt-mark {
+  display: inline-block;
+  will-change: transform;
+  transition: transform 0.15s ease-out;
+  transform-style: preserve-3d;
 }
 
 /* trust strip marquee */
@@ -148,7 +188,9 @@ section[id] {
   }
   .word,
   .week-anim,
-  .intro-mark,
+  .intro3d,
+  .intro-line,
+  .intro-wipe,
   .pop {
     animation: none;
     opacity: 1;

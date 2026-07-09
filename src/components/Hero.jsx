@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { Arc, Magnetic, Reveal, WaButton, Words } from './ui.jsx'
+import { Arc, Magnetic, Reveal, TiltMark, WaButton, Words } from './ui.jsx'
 import markPurple from '../assets/brand/lc-mark-purple.png'
 
 // LCP element — served from /public so index.html can preload it
@@ -40,14 +40,16 @@ export default function Hero() {
     <header className="relative overflow-hidden">
       {/* purple crown — exactly like the printed menu header */}
       <div className="bg-grape pt-10 pb-2 text-center">
-        <img
-          src={markWhite}
-          alt="Low Carb"
-          width="1177"
-          height="575"
-          fetchpriority="high"
-          className="mx-auto h-24 w-auto md:h-28 drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)]"
-        />
+        <TiltMark>
+          <img
+            src={markWhite}
+            alt="Low Carb"
+            width="1177"
+            height="575"
+            fetchpriority="high"
+            className="mx-auto h-24 w-auto md:h-28 drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)]"
+          />
+        </TiltMark>
       </div>
       <Arc fill="#F2EA4F" className="bg-grape -mb-px" />
 

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { QiBadge, Reveal, WaButton, WaIcon } from './ui.jsx'
+import { QiBadge, Reveal, TiltMark, WaButton, WaIcon } from './ui.jsx'
 import { wa, CITY, INSTAGRAM } from '../data/config.js'
 import lockupYellow from '../assets/brand/lc-lockup-yellow.png'
 
@@ -64,7 +64,9 @@ export function Nav() {
     >
       <div className="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-5">
         <a href="#" aria-label="Low Carb — الرئيسية">
-          <img src={lockupYellow} alt="Low Carb" className="h-11 w-auto" />
+          <TiltMark>
+            <img src={lockupYellow} alt="Low Carb" className="h-11 w-auto" />
+          </TiltMark>
         </a>
         <div className="hidden items-center gap-7 font-display text-[15px] font-bold md:flex">
           {LINKS.map(([id, label]) => (
