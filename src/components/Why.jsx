@@ -34,6 +34,12 @@ const ICONS = {
       <circle cx="6" cy="18" r="1.8" />
       <circle cx="18" cy="18" r="1.8" />
     </svg>
+  ),
+  chef: (
+    <svg viewBox="0 0 24 24" className="h-7 w-7" aria-hidden="true" {...stroke}>
+      <path d="M8 10a4 4 0 1 1 .6-4A4.5 4.5 0 0 1 12 4a4.5 4.5 0 0 1 3.4 2A4 4 0 1 1 16 10v6H8v-6Z" />
+      <path d="M8 19h8" />
+    </svg>
   )
 }
 
@@ -55,15 +61,20 @@ const CARDS = [
   },
   {
     icon: 'truck',
-    t: 'توصيل يومي داخل بغداد',
-    d: 'لباب البيت أو المكتب، بالوقت اللي يناسبك.'
+    t: 'توصيل يومي مجاني',
+    d: 'داخل بغداد لباب البيت أو المكتب، بالوقت اللي يناسبك — بدون أي كلفة إضافية.'
+  },
+  {
+    icon: 'chef',
+    t: 'بإشراف شيف مختص بالتغذية',
+    d: 'كل وجبة تنحسب وتنطبخ بإشراف شيف مختص بالتغذية — مو بس أكل صحي بالاسم.'
   }
 ]
 
 export default function Why() {
   return (
     <section className="bg-paper py-20 md:py-24">
-      <div className="mx-auto grid max-w-6xl gap-5 px-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto grid max-w-6xl gap-5 px-6 sm:grid-cols-2 lg:grid-cols-3">
         {CARDS.map((c, i) => (
           <Reveal
             key={c.t}

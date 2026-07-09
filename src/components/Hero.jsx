@@ -106,8 +106,8 @@ export default function Hero() {
           </h1>
           <Reveal delay={160}>
             <p className="mx-auto mt-5 max-w-xl text-lg md:text-xl font-medium text-ink/70">
-              اشتراكات أسبوعية وشهرية على قائمة أربعة أسابيع ما تتكرر —
-              نطبخ يومياً ونوصّل داخل بغداد.
+              مطبخ سحابي متخصص بالأكل الصحي — اشتراكات أسبوعية وشهرية على قائمة
+              أربعة أسابيع ما تتكرر، نطبخ يومياً ونوصّل مجاناً داخل بغداد.
             </p>
           </Reveal>
           <Reveal delay={240} className="mt-9 flex flex-wrap items-center justify-center gap-4">

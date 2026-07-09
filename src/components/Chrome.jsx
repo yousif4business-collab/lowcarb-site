@@ -8,6 +8,7 @@ const LINKS = [
   ['pricing', 'الأسعار'],
   ['menu', 'القائمة'],
   ['app', 'التطبيق'],
+  ['gyms', 'للجيمات'],
   ['faq', 'الأسئلة']
 ]
 
@@ -146,7 +147,7 @@ export function Nav() {
 }
 
 /* ── trust strip — infinite marquee ────────────────────────────────── */
-const POINTS = ['قائمة ٤ أسابيع بدون تكرار', 'طبخ يومي طازج', 'توصيل داخل بغداد', 'أكل لو كارب متوازن']
+const POINTS = ['قائمة ٤ أسابيع بدون تكرار', 'طبخ يومي طازج', 'توصيل مجاني داخل بغداد', 'أكل لو كارب متوازن', 'بإشراف شيف مختص بالتغذية']
 
 export function Strip() {
   return (
@@ -363,6 +364,7 @@ export function Footer() {
           <a href="#pricing" className="transition hover:text-lemon">الأسعار</a>
           <a href="#menu" className="transition hover:text-lemon">القائمة</a>
           <a href="#app" className="transition hover:text-lemon">التطبيق</a>
+          <a href="#gyms" className="transition hover:text-lemon">للجيمات</a>
           <a href="#faq" className="transition hover:text-lemon">الأسئلة</a>
           <a
             href={wa('مرحبا Low Carb')}
@@ -385,7 +387,7 @@ export function Footer() {
           <RateUs />
         </div>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm font-bold text-white/60">
-          <span>توصيل يومي داخل بغداد — السبت إلى الخميس</span>
+          <span>توصيل يومي مجاني داخل بغداد — السبت إلى الخميس</span>
           <span className="flex items-center gap-2">
             الدفع عبر كي كارد
             <QiBadge sm />
