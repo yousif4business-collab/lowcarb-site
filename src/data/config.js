@@ -7,6 +7,9 @@ export const wa = (msg) =>
 
 export const CITY = 'بغداد'
 
+// customer app (PWA)
+export const APP_URL = 'https://lowcarb-app.pages.dev'
+
 // TODO: confirm with the kitchen which Saturday starts "الأسبوع الأول"
 export const ROTATION_ANCHOR = '2026-07-04'
 

@@ -7,6 +7,7 @@ const LINKS = [
   ['how', 'شلون نشتغل'],
   ['pricing', 'الأسعار'],
   ['menu', 'القائمة'],
+  ['app', 'التطبيق'],
   ['faq', 'الأسئلة']
 ]
 
@@ -260,6 +261,7 @@ export function Footer() {
         <div className="mt-6 flex flex-wrap justify-center gap-x-8 gap-y-3 font-display text-[15px] font-bold text-white/75">
           <a href="#pricing" className="transition hover:text-lemon">الأسعار</a>
           <a href="#menu" className="transition hover:text-lemon">القائمة</a>
+          <a href="#app" className="transition hover:text-lemon">التطبيق</a>
           <a href="#faq" className="transition hover:text-lemon">الأسئلة</a>
           <a
             href={wa('مرحبا Low Carb')}

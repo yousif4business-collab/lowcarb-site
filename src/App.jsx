@@ -6,6 +6,7 @@ import Stats from './components/Stats.jsx'
 import Pricing from './components/Pricing.jsx'
 import MenuCard from './components/MenuCard.jsx'
 import Why from './components/Why.jsx'
+import AppDownload from './components/AppDownload.jsx'
 import Faq from './components/Faq.jsx'
 import { Nav, Strip, FinalCta, Footer, FloatingWa, MobileCta } from './components/Chrome.jsx'
 
@@ -23,6 +24,7 @@ export default function App() {
         <Pricing />
         <MenuCard />
         <Why />
+        <AppDownload />
         <Faq />
         <FinalCta />
       </main>
