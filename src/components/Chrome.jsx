@@ -252,6 +252,107 @@ export function MobileCta() {
   )
 }
 
+/* ── شاركنا رأيك — stars + optional text → prefilled WA message ────── */
+function Star({ filled }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-9 w-9"
+      aria-hidden="true"
+      fill={filled ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinejoin="round"
+    >
+      <path d="M12 2.8 14.9 8.7l6.4.9-4.6 4.5 1.1 6.4-5.8-3-5.8 3 1.1-6.4L2.7 9.6l6.4-.9L12 2.8Z" />
+    </svg>
+  )
+}
+
+function RateUs() {
+  const [open, setOpen] = useState(false)
+  const [stars, setStars] = useState(0)
+  const [text, setText] = useState('')
+
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e) => e.key === 'Escape' && setOpen(false)
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open])
+
+  const msg = `تقييمي لـ Low Carb: ${stars}/5${text.trim() ? ` — ${text.trim()}` : ''}`
+
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)} className="transition hover:text-lemon">
+        شاركنا رأيك
+      </button>
+
+      {open && (
+        <div
+          className="fixed inset-0 z-50 grid place-items-center p-5"
+          role="dialog"
+          aria-modal="true"
+          aria-label="شاركنا رأيك"
+        >
+          <button
+            type="button"
+            aria-label="إغلاق"
+            onClick={() => setOpen(false)}
+            className="absolute inset-0 bg-grapedeep/70"
+          />
+          <div className="relative w-full max-w-sm rounded-[28px] bg-white p-7 text-center shadow-pop">
+            <h3 className="font-display text-2xl font-extrabold text-grape">شلون كانت تجربتك؟</h3>
+
+            <div className="mt-5 flex flex-row-reverse justify-center gap-2" dir="ltr">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  aria-label={`${n} من 5`}
+                  aria-pressed={stars >= n}
+                  onClick={() => setStars(n)}
+                  className={`transition hover:scale-110 ${
+                    stars >= n ? 'text-lemon drop-shadow-[0_1px_0_rgba(72,36,101,0.4)]' : 'text-grape/25'
+                  }`}
+                >
+                  <Star filled={stars >= n} />
+                </button>
+              ))}
+            </div>
+
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              rows={3}
+              placeholder="تحب تضيف شي؟ (اختياري)"
+              className="mt-5 w-full resize-none rounded-2xl border-2 border-grape/10 bg-paper p-4 text-start text-[15px] font-medium text-ink placeholder:text-muted/70 focus:border-grape/40 focus:outline-none"
+            />
+
+            {stars > 0 ? (
+              <a
+                href={wa(msg)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+                className="mt-4 flex items-center justify-center gap-2 rounded-full bg-[#25D366] py-3.5 font-display text-[15px] font-extrabold text-white transition hover:brightness-105"
+              >
+                <WaIcon size={20} />
+                دز التقييم على واتساب
+              </a>
+            ) : (
+              <p className="mt-4 rounded-full bg-paper py-3.5 text-[13px] font-bold text-muted">
+                اختار عدد النجوم أول
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
 /* ── footer ────────────────────────────────────────────────────────── */
 export function Footer() {
   return (
@@ -281,6 +382,7 @@ export function Footer() {
               انستغرام
             </a>
           )}
+          <RateUs />
         </div>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm font-bold text-white/60">
           <span>توصيل يومي داخل بغداد — السبت إلى الخميس</span>
