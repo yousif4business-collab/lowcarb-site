@@ -48,6 +48,36 @@ for (const file of walk(join(ROOT, 'src'))) {
 }
 if (!waViolations) pass('all wa.me URLs built via wa()/encodeURIComponent')
 
+// ── 2b. router integrity — every route defined, linked, and mapped ───
+const ROUTES = ['/', '/menu', '/subscribe', '/app', '/gyms', '/about', '/faq']
+const appSrc = readFileSync(join(ROOT, 'src/App.jsx'), 'utf8')
+const chromeSrc = readFileSync(join(ROOT, 'src/components/Chrome.jsx'), 'utf8')
+const sitemap = readFileSync(join(ROOT, 'public/sitemap.xml'), 'utf8')
+let routeViolations = 0
+for (const r of ROUTES) {
+  if (!appSrc.includes(`path="${r}"`)) {
+    fail(`route ${r} has no <Route> in App.jsx`)
+    routeViolations++
+  }
+  if (!chromeSrc.includes(`'${r}'`)) {
+    fail(`route ${r} missing from nav LINKS in Chrome.jsx`)
+    routeViolations++
+  }
+  if (!sitemap.includes(`<loc>https://lowcarb-site.pages.dev${r === '/' ? '/' : r}</loc>`)) {
+    fail(`route ${r} missing from public/sitemap.xml`)
+    routeViolations++
+  }
+}
+if (!appSrc.includes('path="*"')) {
+  fail('catch-all 404 route missing from App.jsx')
+  routeViolations++
+}
+if (existsSync(join(ROOT, 'public/404.html')) || existsSync(join(ROOT, 'dist/404.html'))) {
+  fail('404.html exists — it would disable Cloudflare Pages SPA fallback')
+  routeViolations++
+}
+if (!routeViolations) pass(`router integrity: ${ROUTES.length} routes + catch-all, nav + sitemap in sync`)
+
 // ── 3. build artifacts ───────────────────────────────────────────────
 console.log('… building')
 execSync('npx vite build --logLevel error', { cwd: ROOT, stdio: 'inherit' })

@@ -1,22 +1,24 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link, NavLink } from 'react-router-dom'
 import { QiBadge, Reveal, TiltMark, WaButton, WaIcon } from './ui.jsx'
 import { wa, CITY, INSTAGRAM } from '../data/config.js'
 import lockupYellow from '../assets/brand/lc-lockup-yellow.png'
 
+// [path, label, lowPriority] — low-priority links hide at md, show at lg
 const LINKS = [
-  ['how', 'شلون نشتغل'],
-  ['pricing', 'الأسعار'],
-  ['menu', 'القائمة'],
-  ['app', 'التطبيق'],
-  ['gyms', 'للجيمات'],
-  ['faq', 'الأسئلة']
+  ['/', 'الرئيسية'],
+  ['/menu', 'القائمة'],
+  ['/subscribe', 'الاشتراك'],
+  ['/app', 'التطبيق'],
+  ['/gyms', 'للقاعات', true],
+  ['/about', 'من نحن', true],
+  ['/faq', 'الأسئلة', true]
 ]
 
 /* ── sticky nav: scroll progress, active section, mobile menu ──────── */
 export function Nav() {
   const [progress, setProgress] = useState(0)
   const [scrolled, setScrolled] = useState(false)
-  const [active, setActive] = useState('')
   const [open, setOpen] = useState(false)
   const burgerRef = useRef(null)
 
@@ -44,18 +46,6 @@ export function Nav() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  useEffect(() => {
-    const io = new IntersectionObserver(
-      (es) => es.forEach((e) => e.isIntersecting && setActive(e.target.id)),
-      { rootMargin: '-40% 0px -55% 0px' }
-    )
-    LINKS.forEach(([id]) => {
-      const el = document.getElementById(id)
-      if (el) io.observe(el)
-    })
-    return () => io.disconnect()
-  }, [])
-
   return (
     <nav
       className={`on-grape sticky top-0 z-50 bg-grape/95 backdrop-blur ${
@@ -63,38 +53,40 @@ export function Nav() {
       }`}
     >
       <div className="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-5">
-        <a href="#" aria-label="Low Carb — الرئيسية">
+        <Link to="/" aria-label="Low Carb — الرئيسية">
           <TiltMark>
             <img src={lockupYellow} alt="Low Carb" className="h-11 w-auto" />
           </TiltMark>
-        </a>
-        <div className="hidden items-center gap-7 font-display text-[15px] font-bold md:flex">
-          {LINKS.map(([id, label]) => (
-            <a
-              key={id}
-              href={`#${id}`}
-              className={`transition hover:text-lemon ${
-                active === id ? 'text-lemon' : 'text-white/85'
-              }`}
+        </Link>
+        <div className="hidden items-center gap-6 font-display text-[15px] font-bold md:flex lg:gap-7">
+          {LINKS.map(([path, label, lo]) => (
+            <NavLink
+              key={path}
+              to={path}
+              className={({ isActive }) =>
+                `${lo ? 'hidden lg:inline-block' : ''} transition hover:text-lemon ${
+                  isActive ? 'text-lemon' : 'text-white/85'
+                }`
+              }
             >
               {label}
-            </a>
+            </NavLink>
           ))}
         </div>
         <div className="flex items-center gap-3">
-          <a
-            href="#pricing"
+          <Link
+            to="/subscribe"
             className="hidden rounded-full bg-lemon px-6 py-2.5 font-display text-[15px] font-extrabold text-grape transition hover:-translate-y-0.5 md:block"
           >
             اشترك الآن
-          </a>
+          </Link>
           <button
             ref={burgerRef}
             type="button"
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-label={open ? 'اغلق القائمة' : 'افتح القائمة'}
-            className="grid h-11 w-11 place-items-center rounded-xl text-white md:hidden"
+            className="grid h-11 w-11 place-items-center rounded-xl text-white lg:hidden"
           >
             <svg
               viewBox="0 0 24 24"
@@ -113,27 +105,29 @@ export function Nav() {
 
       {/* mobile panel */}
       {open && (
-        <div className="border-t border-white/10 bg-grapedeep px-5 py-4 md:hidden">
+        <div className="border-t border-white/10 bg-grapedeep px-5 py-4 lg:hidden">
           <div className="flex flex-col gap-1 font-display text-lg font-bold">
-            {LINKS.map(([id, label]) => (
-              <a
-                key={id}
-                href={`#${id}`}
+            {LINKS.map(([path, label]) => (
+              <NavLink
+                key={path}
+                to={path}
                 onClick={() => setOpen(false)}
-                className={`rounded-xl px-4 py-3 transition ${
-                  active === id ? 'bg-white/10 text-lemon' : 'text-white/90'
-                }`}
+                className={({ isActive }) =>
+                  `rounded-xl px-4 py-3 transition ${
+                    isActive ? 'bg-white/10 text-lemon' : 'text-white/90'
+                  }`
+                }
               >
                 {label}
-              </a>
+              </NavLink>
             ))}
-            <a
-              href="#pricing"
+            <Link
+              to="/subscribe"
               onClick={() => setOpen(false)}
               className="mt-2 rounded-full bg-lemon px-6 py-3 text-center font-extrabold text-grape"
             >
               اشترك الآن
-            </a>
+            </Link>
           </div>
         </div>
       )}
@@ -272,7 +266,7 @@ function Star({ filled }) {
   )
 }
 
-function RateUs() {
+export function RateUs({ className = 'transition hover:text-lemon' }) {
   const [open, setOpen] = useState(false)
   const [stars, setStars] = useState(0)
   const [text, setText] = useState('')
@@ -288,7 +282,7 @@ function RateUs() {
 
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className="transition hover:text-lemon">
+      <button type="button" onClick={() => setOpen(true)} className={className}>
         شاركنا رأيك
       </button>
 
@@ -356,46 +350,76 @@ function RateUs() {
   )
 }
 
-/* ── footer ────────────────────────────────────────────────────────── */
+/* ── footer — grouped link columns ─────────────────────────────────── */
 export function Footer() {
   return (
-    <footer className="on-grape bg-grapedeep py-14 text-center">
+    <footer className="on-grape bg-grapedeep py-14">
       <div className="mx-auto max-w-6xl px-6">
         <img src={lockupYellow} alt="Low Carb" className="mx-auto h-14 w-auto" />
-        <div className="mt-6 flex flex-wrap justify-center gap-x-8 gap-y-3 font-display text-[15px] font-bold text-white/75">
-          <a href="#pricing" className="transition hover:text-lemon">الأسعار</a>
-          <a href="#menu" className="transition hover:text-lemon">القائمة</a>
-          <a href="#app" className="transition hover:text-lemon">التطبيق</a>
-          <a href="#gyms" className="transition hover:text-lemon">للجيمات</a>
-          <a href="#faq" className="transition hover:text-lemon">الأسئلة</a>
-          <a
-            href={wa('مرحبا Low Carb')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="transition hover:text-lemon"
-          >
-            واتساب
-          </a>
-          {INSTAGRAM && (
-            <a
-              href={INSTAGRAM}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition hover:text-lemon"
-            >
-              انستغرام
-            </a>
-          )}
-          <RateUs />
+
+        <div className="mx-auto mt-10 grid max-w-3xl gap-10 text-center sm:grid-cols-3 sm:text-start">
+          <div>
+            <h3 className="font-display text-[15px] font-extrabold text-lemon">الصفحات</h3>
+            <ul className="mt-3 space-y-2 font-display text-[15px] font-bold text-white/75">
+              {LINKS.map(([path, label]) => (
+                <li key={path}>
+                  <Link to={path} className="transition hover:text-lemon">
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-display text-[15px] font-extrabold text-lemon">تواصل</h3>
+            <ul className="mt-3 space-y-2 font-display text-[15px] font-bold text-white/75">
+              <li>
+                <a
+                  href={wa('مرحبا Low Carb')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition hover:text-lemon"
+                >
+                  واتساب
+                </a>
+              </li>
+              {INSTAGRAM && (
+                <li>
+                  <a
+                    href={INSTAGRAM}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="transition hover:text-lemon"
+                  >
+                    انستغرام
+                  </a>
+                </li>
+              )}
+              <li>
+                <RateUs />
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-display text-[15px] font-extrabold text-lemon">الدفع والتوصيل</h3>
+            <div className="mt-3 flex justify-center sm:justify-start">
+              <QiBadge sm />
+            </div>
+            <p className="mt-3 text-sm font-bold leading-relaxed text-white/60">
+              الدفع عبر تحويل كي كارد
+              <br />
+              توصيل يومي مجاني داخل بغداد
+              <br />
+              السبت إلى الخميس
+            </p>
+          </div>
         </div>
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm font-bold text-white/60">
-          <span>توصيل يومي مجاني داخل بغداد — السبت إلى الخميس</span>
-          <span className="flex items-center gap-2">
-            الدفع عبر كي كارد
-            <QiBadge sm />
-          </span>
-        </div>
-        <p className="mt-3 text-sm text-white/60">© Low Carb · {CITY} — جميع الحقوق محفوظة</p>
+
+        <p className="mt-10 text-center text-sm text-white/60">
+          © Low Carb · {CITY} — جميع الحقوق محفوظة
+        </p>
       </div>
     </footer>
   )

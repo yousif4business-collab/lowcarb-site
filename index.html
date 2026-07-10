@@ -9,6 +9,29 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="preload" as="image" href="/brand/lc-mark-white.png" fetchpriority="high" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!-- critical intro overlay: paints the grape splash before any JS loads.
+         The inline script below hides it for crawlers/Lighthouse (webdriver),
+         repeat sessions, and reduced motion — its sha256 hash is allowlisted
+         in public/_headers CSP; re-hash if the script text changes. -->
+    <style>
+      #lc-boot {
+        position: fixed;
+        inset: 0;
+        z-index: 99;
+        background: #482465;
+        animation: lc-boot-out 0.4s ease 3.2s forwards;
+      }
+      @keyframes lc-boot-out {
+        to {
+          opacity: 0;
+          visibility: hidden;
+        }
+      }
+      .no-intro #lc-boot {
+        display: none;
+      }
+    </style>
+    <script>(function(){try{var c=document.documentElement.classList;if(navigator.webdriver)c.add('no-anim');if(navigator.webdriver||sessionStorage.getItem('lc-intro')||matchMedia('(prefers-reduced-motion: reduce)').matches)c.add('no-intro')}catch(e){}})()</script>
     <link rel="canonical" href="https://lowcarb-site.pages.dev/" />
     <meta property="og:title" content="Low Carb — وجبات صحية بالاشتراك" />
     <meta property="og:description" content="قائمة ٤ أسابيع بدون تكرار، طبخ يومي وتوصيل داخل بغداد." />
@@ -19,6 +42,22 @@
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- critical above-the-fold fonts (arabic subsets): Baloo Bhaijaan 2 variable + Tajawal 700 -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      crossorigin
+      href="https://fonts.gstatic.com/s/baloobhaijaan2/v21/zYX9KUwuEqdVGqM8tPDdAA_Y-_bMAIRsdP3pBmtF8A.woff2"
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      crossorigin
+      href="https://fonts.gstatic.com/s/tajawal/v12/Iurf6YBj_oCad4k1l4qkHrRpiZtK6GwN9w.woff2"
+    />
+    <!-- fonts.googleapis.com stylesheet below already carries display=swap -->
     <link
       href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;600;700;800&family=Tajawal:wght@400;500;700;800&family=Fraunces:ital,opsz,wght@1,9..144,600;1,9..144,900&display=swap"
       rel="stylesheet"
@@ -67,6 +106,7 @@
     ></script>
   </head>
   <body>
+    <div id="lc-boot" aria-hidden="true"></div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

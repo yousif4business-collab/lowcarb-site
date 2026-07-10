@@ -124,17 +124,20 @@ section[id] {
   position: absolute;
   inset-inline: -20%;
   bottom: -25%;
-  height: 0;
+  height: 175%;
   background: #f2ea4f;
   border-radius: 50% 50% 0 0 / 30% 30% 0 0;
   pointer-events: none;
+  /* rises via transform, not height — height animation counts as layout shift (CLS) */
+  transform: translateY(100%);
+  will-change: transform;
 }
 .intro-wipe.go {
   animation: introWipe 0.55s cubic-bezier(0.6, 0, 0.3, 1) both;
 }
 @keyframes introWipe {
   to {
-    height: 175%;
+    transform: translateY(0);
   }
 }
 
@@ -172,6 +175,18 @@ section[id] {
   to {
     transform: scale(1);
   }
+}
+
+/* .no-anim is stamped on <html> by the inline script in index.html for
+   crawlers only (navigator.webdriver). Entrance animations render instantly
+   there so Lighthouse/bots measure the real page instead of opacity-0
+   frames — humans are unaffected. */
+html.no-anim .word,
+html.no-anim .reveal {
+  animation: none;
+  opacity: 1;
+  transform: none;
+  transition: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

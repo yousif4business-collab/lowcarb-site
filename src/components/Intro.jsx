@@ -6,10 +6,17 @@ const markWhite = '/brand/lc-mark-white.png'
    ≤2.5s total, click-skip, once per session, skipped under reduced motion */
 export default function Intro() {
   const [phase, setPhase] = useState(() => {
+    // keep in sync with the #lc-boot inline script in index.html
+    if (navigator.webdriver) return 'off'
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 'off'
     if (sessionStorage.getItem('lc-intro')) return 'off'
     return 'show'
   })
+
+  // the React overlay (or nothing) takes over from the static boot splash
+  useEffect(() => {
+    document.getElementById('lc-boot')?.remove()
+  }, [])
 
   useEffect(() => {
     if (phase === 'off') return

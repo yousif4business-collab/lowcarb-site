@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { wa } from '../data/config.js'
 
 /* ── scroll reveal wrapper ─────────────────────────────────────────── */
-export function Reveal({ children, className = '', as: Tag = 'div', delay = 0 }) {
+export function Reveal({ children, className = '', as: Tag = 'div', delay = 0, ...rest }) {
   const ref = useRef(null)
   const [inView, setInView] = useState(false)
   useEffect(() => {
@@ -26,6 +26,7 @@ export function Reveal({ children, className = '', as: Tag = 'div', delay = 0 })
       ref={ref}
       style={delay ? { transitionDelay: `${delay}ms` } : undefined}
       className={`reveal ${inView ? 'in' : ''} ${className}`}
+      {...rest}
     >
       {children}
     </Tag>
@@ -180,13 +181,15 @@ const qiLogo = import.meta.glob('../assets/brand/qi.png', {
 
 export function QiBadge({ sm = false, className = '' }) {
   if (qiLogo) {
+    // the official roundel carries no wordmark — always label it (brand rule)
     return (
       <span
-        className={`inline-flex items-center rounded-xl bg-white px-3 ring-1 ring-grape/15 ${
-          sm ? 'py-1' : 'py-1.5'
+        className={`inline-flex items-center rounded-full bg-white font-display font-bold text-grape ring-1 ring-grape/15 ${
+          sm ? 'gap-1.5 px-3 py-1 text-[13px]' : 'gap-2 px-4 py-1.5 text-[15px]'
         } ${className}`}
       >
-        <img src={qiLogo} alt="Qi Card" className={`w-auto ${sm ? 'h-6' : 'h-8'}`} />
+        <img src={qiLogo} alt="" className={sm ? 'h-5 w-5' : 'h-6 w-6'} />
+        كي كارد
       </span>
     )
   }

@@ -27,7 +27,15 @@ const VIEWS = [
 
 const GROUPS = browseByType()
 
-export default function MenuCard() {
+/* week summary — dish count + average kcal/day, from the nutrition sheet */
+function weekSummary(week) {
+  const dishes = week.days.reduce((n, d) => n + d.dishes.length, 0)
+  const kcal = week.days.map((d) => dayTotals(d.dishes).kcal)
+  const avg = Math.round(kcal.reduce((a, b) => a + b, 0) / kcal.length / 10) * 10
+  return `${week.days.length} أيام · ${dishes} أكلة · معدل ~${avg} سعرة باليوم`
+}
+
+export default function MenuCard({ noHeader = false }) {
   const currentWeek = todayRotation().weekNo
   const [view, setView] = useState('week')
   const [week, setWeek] = useState(currentWeek)
@@ -35,19 +43,23 @@ export default function MenuCard() {
   const active = WEEKS.find((w) => w.id === week)
 
   return (
-    <section id="menu" className="bg-paper py-20 md:py-28">
+    <section id="menu" className={`bg-paper ${noHeader ? 'py-10 md:py-14' : 'py-20 md:py-28'}`}>
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         <div className="text-center">
-          <Reveal>
-            <h2 className="font-display text-3xl font-extrabold text-grape md:text-5xl">
-              قائمة الأربع أسابيع
-            </h2>
-          </Reveal>
-          <Reveal delay={90}>
-            <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
-              نفس المنيو المطبوع مالتنا — بس تفاعلي. كل أسبوع أكلات مختلفة، بدون تكرار.
-            </p>
-          </Reveal>
+          {!noHeader && (
+            <>
+              <Reveal>
+                <h2 className="font-display text-3xl font-extrabold text-grape md:text-5xl">
+                  قائمة الأربع أسابيع
+                </h2>
+              </Reveal>
+              <Reveal delay={90}>
+                <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
+                  نفس المنيو المطبوع مالتنا — بس تفاعلي. كل أسبوع أكلات مختلفة، بدون تكرار.
+                </p>
+              </Reveal>
+            </>
+          )}
           <Reveal delay={140}>
             <button
               type="button"
@@ -200,8 +212,14 @@ export default function MenuCard() {
               </>
             )}
 
+            {view === 'week' && (
+              <p className="px-6 pt-4 text-center font-display text-[14px] font-bold text-grape">
+                {weekSummary(active)}
+              </p>
+            )}
+
             {!NUTRITION_CONFIRMED && (
-              <p className="px-6 pt-4 text-center text-[13px] font-bold text-grape/80">
+              <p className="px-6 pt-2 text-center text-[13px] font-bold text-grape/80">
                 * القيم الغذائية تقريبية وقد تختلف حسب التحضير
               </p>
             )}

@@ -63,31 +63,38 @@ export default function Hero() {
           className="pointer-events-none absolute left-[-4%] top-6 hidden w-72 -rotate-12 opacity-[0.05] lg:block"
         />
 
-        {/* floating bowls, from their real menu photos */}
-        <Parallax speed={0.08} className="-right-10 top-2 w-36 md:right-[6%] md:top-6 md:w-52 lg:w-60">
+        {/* floating bowls, from their real menu photos — fixed-aspect
+            containers + explicit dimensions so image load never shifts layout */}
+        <Parallax speed={0.08} className="aspect-square -right-10 top-2 w-36 md:right-[6%] md:top-6 md:w-52 lg:w-60">
           <img
             src={bowlChicken}
             alt=""
             aria-hidden="true"
-            className="animate-floaty w-full"
+            width="480"
+            height="480"
+            className="animate-floaty absolute inset-0 w-full"
             style={{ '--rot': '-6deg' }}
           />
         </Parallax>
-        <Parallax speed={0.12} className="-left-12 bottom-4 w-32 md:left-[7%] md:bottom-10 md:w-44">
+        <Parallax speed={0.12} className="aspect-square -left-12 bottom-4 w-32 md:left-[7%] md:bottom-10 md:w-44">
           <img
             src={bowlOrange}
             alt=""
             aria-hidden="true"
-            className="animate-floaty w-full"
+            width="480"
+            height="480"
+            className="animate-floaty absolute inset-0 w-full"
             style={{ '--rot': '7deg', animationDelay: '1.4s' }}
           />
         </Parallax>
-        <Parallax speed={0.05} className="hidden lg:block right-[22%] -bottom-14 w-40">
+        <Parallax speed={0.05} className="aspect-square hidden lg:block right-[22%] -bottom-14 w-40">
           <img
             src={bowlVeggie}
             alt=""
             aria-hidden="true"
-            className="animate-floaty w-full"
+            width="480"
+            height="480"
+            className="animate-floaty absolute inset-0 w-full"
             style={{ '--rot': '3deg', animationDelay: '2.6s' }}
           />
         </Parallax>
