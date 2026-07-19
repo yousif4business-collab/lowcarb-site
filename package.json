@@ -8,6 +8,7 @@
     "build": "vite build",
     "build:onefile": "SINGLE=1 vite build",
     "qa": "node scripts/qa.mjs",
+    "e2e": "playwright test",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -16,6 +17,7 @@
     "react-router-dom": "^7.18.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@vitejs/plugin-react": "^5.2.0",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.41",
