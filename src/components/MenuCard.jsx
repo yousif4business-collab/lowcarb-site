@@ -5,6 +5,7 @@ import { todayRotation } from '../data/rotation.js'
 import { NUTRITION_CONFIRMED, dishInfo, dayTotals } from '../data/nutrition.js'
 import { browseByType } from '../data/browse.js'
 import { dishImage } from '../data/dishImages.js'
+import { matchesAr } from '../lib/arabic.js'
 import markPurple from '../assets/brand/lc-mark-purple.png'
 
 const markWhite = '/brand/lc-mark-white.png'
@@ -40,7 +41,20 @@ export default function MenuCard({ noHeader = false }) {
   const [view, setView] = useState('week')
   const [week, setWeek] = useState(currentWeek)
   const [filter, setFilter] = useState('all')
+  const [q, setQ] = useState('')
   const active = WEEKS.find((w) => w.id === week)
+
+  const query = q.trim()
+  // search: week view dims non-matches per dish; النوع view filters the lists
+  const weekHasMatch =
+    !query || active.days.some((d) => d.dishes.some((dish) => matchesAr(dish, query)))
+  const groups = query
+    ? GROUPS.map((g) => ({
+        ...g,
+        dishes: g.dishes.filter(({ dish }) => matchesAr(dish, query))
+      })).filter((g) => g.dishes.length > 0)
+    : GROUPS
+
 
   return (
     <section id="menu" className={`bg-paper ${noHeader ? 'py-10 md:py-14' : 'py-20 md:py-28'}`}>
@@ -155,6 +169,18 @@ export default function MenuCard({ noHeader = false }) {
               </div>
             </div>
 
+            {/* dish search — normalized Arabic matching across both views */}
+            <div className="flex justify-center px-6 pt-3">
+              <input
+                type="search"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="دوّر على أكلة… مثلاً برياني"
+                aria-label="دوّر على أكلة"
+                className="w-full max-w-sm rounded-full border-2 border-grape/15 bg-white/70 px-5 py-2.5 text-center text-[15px] font-medium text-ink placeholder:text-muted/60 focus:border-grape focus:bg-white focus:outline-none"
+              />
+            </div>
+
             {view === 'week' && (
               <>
                 {/* nutrition filters */}
@@ -224,7 +250,9 @@ export default function MenuCard({ noHeader = false }) {
               </p>
             )}
 
-            {view === 'week' ? (
+            {view === 'week' && !weekHasMatch ? (
+              <SearchEmpty onClear={() => setQ('')} />
+            ) : view === 'week' ? (
               /* days */
               <div
                 key={week}
@@ -234,13 +262,15 @@ export default function MenuCard({ noHeader = false }) {
                 className="week-anim grid gap-5 px-6 pb-16 pt-6 md:grid-cols-2 md:px-12 lg:grid-cols-3"
               >
                 {active.days.map((d) => (
-                  <DayCard key={d.day} d={d} filter={filter} />
+                  <DayCard key={d.day} d={d} filter={filter} query={query} />
                 ))}
               </div>
+            ) : groups.length === 0 ? (
+              <SearchEmpty onClear={() => setQ('')} />
             ) : (
               /* categories — all unique dishes across the 4 weeks */
               <div className="week-anim grid gap-5 px-6 pb-16 pt-6 md:grid-cols-2 md:px-12 lg:grid-cols-3">
-                {GROUPS.map((g) => (
+                {groups.map((g) => (
                   <TypeCard key={g.cat} g={g} />
                 ))}
               </div>
@@ -252,8 +282,27 @@ export default function MenuCard({ noHeader = false }) {
   )
 }
 
+/* search found nothing in the current view */
+function SearchEmpty({ onClear }) {
+  return (
+    <div className="px-6 pb-16 pt-10 text-center">
+      <p className="font-display text-2xl font-extrabold text-grape">ما لقينا هاي الأكلة</p>
+      <p className="mt-2 text-[15px] font-medium text-muted">
+        جرب اسم ثاني — أو امسح البحث وشوف القائمة كاملة.
+      </p>
+      <button
+        type="button"
+        onClick={onClear}
+        className="mt-5 rounded-full bg-grape px-6 py-2.5 font-display text-[15px] font-bold text-lemon transition hover:-translate-y-0.5"
+      >
+        امسح البحث
+      </button>
+    </div>
+  )
+}
+
 /* one day: dish rows expand to a macro panel — single-open per card */
-function DayCard({ d, filter = 'all' }) {
+function DayCard({ d, filter = 'all', query = '' }) {
   const [open, setOpen] = useState(-1)
   const totals = dayTotals(d.dishes)
 
@@ -268,6 +317,7 @@ function DayCard({ d, filter = 'all' }) {
       : null
 
   const dimmed = (dish) => {
+    if (query && !matchesAr(dish, query)) return true
     if (filter === 'all' || filter === 'low') return false
     return !(dishInfo(dish)?.tags ?? []).includes(filter)
   }
