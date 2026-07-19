@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { flushSync } from 'react-dom'
 import { Reveal, ShareIcon, shareWeek } from './ui.jsx'
 import { WEEKS } from '../data/menu.js'
 import { todayRotation } from '../data/rotation.js'
@@ -55,6 +56,11 @@ export default function MenuCard({ noHeader = false }) {
       })).filter((g) => g.dishes.length > 0)
     : GROUPS
 
+  // «اطبع القائمة» prints the current week — force week view before the dialog
+  const printWeek = () => {
+    flushSync(() => setView('week'))
+    window.print()
+  }
 
   return (
     <section id="menu" className={`bg-paper ${noHeader ? 'py-10 md:py-14' : 'py-20 md:py-28'}`}>
@@ -74,7 +80,7 @@ export default function MenuCard({ noHeader = false }) {
               </Reveal>
             </>
           )}
-          <Reveal delay={140}>
+          <Reveal delay={140} className="no-print flex flex-wrap justify-center gap-3">
             <button
               type="button"
               onClick={() => shareWeek(active)}
@@ -82,6 +88,14 @@ export default function MenuCard({ noHeader = false }) {
             >
               <ShareIcon />
               شارك منيو الأسبوع
+            </button>
+            <button
+              type="button"
+              onClick={printWeek}
+              className="mt-5 inline-flex items-center gap-2 rounded-full border-2 border-grape/20 px-5 py-2.5 font-display text-[15px] font-bold text-grape transition hover:border-grape hover:bg-grape hover:text-lemon"
+            >
+              <PrintIcon />
+              اطبع القائمة
             </button>
           </Reveal>
         </div>
@@ -124,8 +138,16 @@ export default function MenuCard({ noHeader = false }) {
           />
 
           <div className="relative overflow-hidden rounded-[40px] bg-lemon shadow-pop">
+            {/* print-only letterhead: mark + week title (screen never sees it) */}
+            <div className="print-only pb-2 pt-4 text-center">
+              <img src={markPurple} alt="Low Carb" className="print-keep mx-auto h-14 w-auto" />
+              <p className="mt-2 font-display text-2xl font-extrabold text-grape">
+                قائمة {active.title} — Low Carb
+              </p>
+            </div>
+
             {/* purple crown like the printed card */}
-            <div className="relative bg-grape pb-12 pt-7 text-center md:pb-14">
+            <div className="no-print relative bg-grape pb-12 pt-7 text-center md:pb-14">
               <img src={markWhite} alt="" className="mx-auto h-14 md:h-16" />
               <svg
                 viewBox="0 0 1440 110"
@@ -146,7 +168,7 @@ export default function MenuCard({ noHeader = false }) {
             />
 
             {/* view toggle */}
-            <div className="flex justify-center px-6 pt-3">
+            <div className="no-print flex justify-center px-6 pt-3">
               <div
                 role="tablist"
                 aria-label="طريقة العرض"
@@ -170,7 +192,7 @@ export default function MenuCard({ noHeader = false }) {
             </div>
 
             {/* dish search — normalized Arabic matching across both views */}
-            <div className="flex justify-center px-6 pt-3">
+            <div className="no-print flex justify-center px-6 pt-3">
               <input
                 type="search"
                 value={q}
@@ -184,7 +206,7 @@ export default function MenuCard({ noHeader = false }) {
             {view === 'week' && (
               <>
                 {/* nutrition filters */}
-                <div className="flex flex-wrap justify-center gap-2 px-6 pt-3">
+                <div className="no-print flex flex-wrap justify-center gap-2 px-6 pt-3">
                   {FILTERS.map((f) => (
                     <button
                       key={f.v}
@@ -206,7 +228,7 @@ export default function MenuCard({ noHeader = false }) {
                 <div
                   role="tablist"
                   aria-label="أسابيع القائمة"
-                  className="flex flex-wrap justify-center gap-2.5 px-6 pt-2 md:gap-3"
+                  className="no-print flex flex-wrap justify-center gap-2.5 px-6 pt-2 md:gap-3"
                 >
                   {WEEKS.map((w) => (
                     <button
@@ -298,6 +320,25 @@ function SearchEmpty({ onClear }) {
         امسح البحث
       </button>
     </div>
+  )
+}
+
+function PrintIcon({ size = 18 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+      <path d="M6 14h12v7H6z" />
+    </svg>
   )
 }
 

@@ -208,6 +208,69 @@ section[id] {
   }
 }
 
+/* «اطبع القائمة» — print shows only the menu card's current week, one page */
+.print-only {
+  display: none;
+}
+@media print {
+  nav,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+  /* on /menu print only the menu card (crown/tabs/bowls inside it carry .no-print) */
+  body:has(#menu) main > :not(#menu) {
+    display: none !important;
+  }
+  .print-only {
+    display: block;
+  }
+  body {
+    background: #fff;
+  }
+  #menu {
+    background: #fff !important;
+    padding: 0 !important;
+  }
+  #menu .rounded-\[40px\] {
+    background: #fff !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  #menu .shadow-pop,
+  #menu .shadow-card {
+    box-shadow: none !important;
+  }
+  /* compact day grid so the week fits one page */
+  #week-panel {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+    padding: 12px 0 0 !important;
+  }
+  #week-panel > div {
+    border: 1px solid rgba(72, 36, 101, 0.25);
+    background: #fff !important;
+    break-inside: avoid;
+    padding: 10px 12px !important;
+  }
+  #week-panel .text-lg {
+    font-size: 13px !important;
+  }
+  #week-panel h3 {
+    font-size: 16px !important;
+  }
+  /* keep macro accordions closed + interactive chrome out of the print */
+  #menu .acc-body,
+  #menu svg,
+  #menu img:not(.print-keep) {
+    display: none !important;
+  }
+  .week-anim {
+    animation: none !important;
+  }
+}
+
 /* .no-anim is stamped on <html> by the inline script in index.html for
    crawlers only (navigator.webdriver). Entrance animations render instantly
    there so Lighthouse/bots measure the real page instead of opacity-0

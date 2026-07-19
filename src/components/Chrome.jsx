@@ -204,7 +204,7 @@ export function FloatingWa() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="راسلنا على واتساب"
-      className="fixed bottom-6 left-6 z-40 hidden h-14 w-14 place-items-center rounded-full bg-[#25D366] text-white shadow-pop transition hover:-translate-y-1 md:grid"
+      className="no-print fixed bottom-6 left-6 z-40 hidden h-14 w-14 place-items-center rounded-full bg-[#25D366] text-white shadow-pop transition hover:-translate-y-1 md:grid"
     >
       <WaIcon size={26} />
     </a>
@@ -224,7 +224,7 @@ export function MobileCta() {
 
   return (
     <div
-      className={`fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-grape/95 backdrop-blur transition-transform duration-300 md:hidden ${
+      className={`no-print fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-grape/95 backdrop-blur transition-transform duration-300 md:hidden ${
         show ? 'translate-y-0' : 'translate-y-full'
       }`}
       style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}
