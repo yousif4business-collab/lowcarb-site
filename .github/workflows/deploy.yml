@@ -1,0 +1,108 @@
+name: deploy
+
+# Push to main is the only trigger — the site has no staging tier, and the e2e
+# suite below is the gate that keeps a bad main out of production.
+# workflow_dispatch stays available for re-running a deploy without a commit
+# (e.g. after rotating a token, or to re-sync a mirror that drifted).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Never let two deploys race: a slower older run must not overwrite a newer one.
+# We do NOT cancel in-progress runs — a half-finished run that already pushed to
+# Cloudflare but not Netlify would leave the two hosts serving different bundles.
+concurrency:
+  group: deploy-main
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Covers what e2e cannot: nutrition coverage, wa.me encoding hygiene,
+      # router/nav/sitemap integrity, and that every absolute URL agrees with
+      # the canonical origin. Exits 1 on any failure (warnings do not fail).
+      - name: QA gate
+        run: npm run qa
+
+      # Cached separately from node_modules: the browser binaries are ~400MB and
+      # only change when @playwright/test does, so key off the resolved version.
+      - name: Resolve Playwright version
+        id: pw
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+
+      - name: Install Playwright browsers
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium webkit
+
+      # System deps are outside the cached directory, so they must be installed
+      # even on a cache hit or webkit fails to launch.
+      - name: Install Playwright system deps
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium webkit
+
+      # Built explicitly before e2e so a build break reports as a build break
+      # rather than as a webServer timeout 180s later. Playwright's webServer
+      # rebuilds into the same dist/, and vite output is deterministic for a
+      # given source tree, so the artifact deployed below is the tested one.
+      - name: Build
+        run: npm run build
+
+      # 92 tests: chromium + webkit x desktop(1280) + mobile(390).
+      # Fails closed — no deploy step runs if a single test fails.
+      - name: End-to-end tests
+        run: npm run e2e
+
+      - name: Verify build artifact
+        run: |
+          test -s dist/index.html || { echo "::error::dist/index.html missing or empty"; exit 1; }
+          test -s dist/_headers   || { echo "::error::dist/_headers missing — security headers would be dropped"; exit 1; }
+          test -s dist/_redirects || { echo "::error::dist/_redirects missing — SPA deep links would 404 on Netlify"; exit 1; }
+          echo "bundle-sha=$(find dist -type f -exec sha256sum {} + | sort -k2 | sha256sum | cut -d' ' -f1)" >> "$GITHUB_STEP_SUMMARY"
+
+      # --- Primary: Cloudflare Pages ---------------------------------------
+      # Deployed first and on its own. If this fails the job stops here and
+      # Netlify keeps serving the previous (known-good) bundle rather than
+      # racing ahead of the primary.
+      - name: Deploy to Cloudflare Pages (primary)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy dist
+            --project-name=lowcarb-site
+            --branch=main
+            --commit-dirty=true
+
+      # --- Mirror: Netlify --------------------------------------------------
+      # Only runs when Cloudflare succeeded (default step ordering). Version is
+      # pinned so a netlify-cli release can never break a deploy unannounced.
+      - name: Deploy to Netlify (mirror)
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: npx --yes netlify-cli@27 deploy --prod --dir=dist --message="${{ github.sha }}"

@@ -8,6 +8,11 @@ export default defineConfig({
   testDir: 'e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
+  // webkit-desktop intermittently loses a visibility assertion under full
+  // parallel load (different test each run; all pass in isolation). With the
+  // deploy pipeline gated on this suite, a flake would block a good release —
+  // so retry in CI only. Locally 0, so flakes stay visible instead of hidden.
+  retries: process.env.CI ? 2 : 0,
   reporter: 'list',
   use: {
     baseURL: `http://localhost:${PORT}`

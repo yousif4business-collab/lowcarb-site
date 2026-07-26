@@ -1,0 +1,8 @@
+# SPA fallback — react-router owns /menu, /subscribe, /app, /gyms, /about, /faq
+# and the friendly 404. Cloudflare Pages does this implicitly when a project has
+# no 404.html, but Netlify hard-404s deep links without an explicit rule, so the
+# mirror needs this file to behave identically to the primary.
+#
+# Static files win over this rule on both hosts (no `!` force), so /robots.txt,
+# /sitemap.xml and /assets/* keep serving real files.
+/*  /index.html  200
