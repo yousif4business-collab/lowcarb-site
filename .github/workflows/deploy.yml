@@ -125,6 +125,15 @@ jobs:
       # not block the mirror, which is the whole point of the probe above.
       # Version is pinned so a netlify-cli release can never break a deploy
       # unannounced.
+      #
+      # netlify-cli@27 declares engines node >=22.12, so it must not run on the
+      # node 20 used above. Build and e2e stay on 20 deliberately — that is the
+      # version the artifact is tested under — and only the upload switches.
+      - name: Switch to node 22 for netlify-cli
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - name: Deploy to Netlify (mirror)
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
