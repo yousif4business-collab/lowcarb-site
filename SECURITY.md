@@ -44,6 +44,43 @@ HTTP (`curl`) using actual `anon` / user JWTs; **never trust the MCP or
 customer data: two throwaway accounts, prove A cannot read B, prove anon
 gets nothing. Policy files live in `PLANS/*.sql`.
 
+## Known advisories
+
+### react-router 7.18.1 — GHSA-qwww-vcr4-c8h2 (high) — **accepted risk**
+
+*"RSC Mode CSRF Bypass Allows Action Execution Before 400 Response."*
+Affects `react-router` / `react-router-dom` **7.12.0 – 8.2.0**; we run 7.18.1.
+
+**The vector is not reachable in this codebase.** Assessed 2026-07-27:
+
+| requirement of the exploit | present here? |
+|---|---|
+| RSC (React Server Components) mode | no — no `@vitejs/plugin-rsc`, no react-server entry |
+| Server actions to execute | no — no `action`/`loader`, no `useFetcher`, no `<Form>` |
+| A data router | no — `BrowserRouter` only, all six `react-router-dom` imports are client-side |
+| A server to run any of it | no — static files on a CDN, no origin, no SSR |
+
+The exploit runs a server action before the framework returns 400. This site
+has no server and defines no actions, so there is nothing to execute early.
+
+**Decision:** stay on 7.x and upgrade to **8.3.0** when it ships. Do *not* take
+npm's suggested fix — it proposes a **downgrade to 7.11.0** (`isSemVerMajor:
+true`), which buys nothing against an unreachable vector while freezing us
+below the line where later 7.x fixes land.
+
+**Re-open this decision immediately if** the site ever adopts RSC, a data
+router (`createBrowserRouter` + `RouterProvider`), route `action`s, SSR, or any
+server runtime. At that point the vector becomes live and 8.3.0 is mandatory,
+not optional.
+
+### postcss ≤8.5.17 — GHSA-r28c-9q8g-f849 (high, CVSS 7.5) — **open, fixable**
+
+Path traversal via `sourceMappingURL` auto-loading → arbitrary `.map` file
+disclosure. Build-time dev dependency only, and it requires processing
+attacker-controlled CSS, which our build never does — so exposure is low. But
+unlike the react-router item **this one has a real fix available**, so it
+should be patched rather than accepted.
+
 ## Incident log
 
 - **2026-07-06** — Cloudflare Pages project `lowcarb-site` was found
