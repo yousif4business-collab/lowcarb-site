@@ -87,7 +87,29 @@ jobs:
       # Deployed first and on its own. If this fails the job stops here and
       # Netlify keeps serving the previous (known-good) bundle rather than
       # racing ahead of the primary.
+      #
+      # CLOUDFLARE_API_TOKEN is not set yet (see STATUS.md → DEFERRED — DOMAIN
+      # & CI-CLOUDFLARE). Until it lands, CI deploys the Netlify mirror only and
+      # Cloudflare production is published by hand with wrangler. The secrets
+      # context is not available to a step-level `if:`, so the probe below turns
+      # its presence into a step output. The day the secret is added this step
+      # starts running on the very next push, with no edit to this file.
+      - name: Probe for Cloudflare credentials
+        id: cf
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -n "$CF_TOKEN" ] && [ -n "$CF_ACCOUNT" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID absent — skipping the Cloudflare Pages deploy. Netlify mirror still deploys; Cloudflare production must be published manually with wrangler."
+            echo "- **Cloudflare Pages: SKIPPED** (credentials absent) — publish manually with \`npx wrangler pages deploy dist --project-name lowcarb-site --branch main\`" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Deploy to Cloudflare Pages (primary)
+        if: steps.cf.outputs.enabled == 'true'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -99,8 +121,10 @@ jobs:
             --commit-dirty=true
 
       # --- Mirror: Netlify --------------------------------------------------
-      # Only runs when Cloudflare succeeded (default step ordering). Version is
-      # pinned so a netlify-cli release can never break a deploy unannounced.
+      # Runs unless Cloudflare actively FAILED — a skipped Cloudflare step does
+      # not block the mirror, which is the whole point of the probe above.
+      # Version is pinned so a netlify-cli release can never break a deploy
+      # unannounced.
       - name: Deploy to Netlify (mirror)
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
